@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026九州親子自由行</title>
+    <style>
+        :root { 
+            --bg-color: #FFF8E7; 
+            --primary-color: #F4A460; 
+            --secondary-color: #87CEEB; 
+            --text-color: #5D4037;
+            --active-color: #5D4037; 
+        }
+        
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); }
+        body { font-family: '微軟正黑體', sans-serif; display: flex; flex-direction: column; background-image: radial-gradient(#F0E0D0 1px, transparent 1px); background-size: 20px 20px; }
+        
+        .banner-container { width: 100%; text-align: center; margin-bottom: 2px; padding: 0; flex-shrink: 0; }
+        .banner-img { width: 100%; max-width: 100%; display: block; border-radius: 0 0 15px 15px; }
+
+        .nav-dates { display: flex; overflow-x: auto; gap: 8px; padding: 5px 10px; margin-bottom: 5px; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
+        .nav-dates::-webkit-scrollbar { display: none; }
+
+        .date-btn { 
+            background-color: #fff; 
+            border: 2px solid var(--primary-color); 
+            border-radius: 12px; 
+            padding: 10px 15px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1em; 
+            color: var(--primary-color); 
+            flex-shrink: 0; 
+            white-space: nowrap;
+        }
+        .date-btn.active { background-color: var(--active-color); color: #fff; border-color: var(--active-color); }
+
+        .itinerary-container { 
+            margin: 0 10px 10px 10px;
+            background-color: #fff; 
+            border-radius: 20px; 
+            padding: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border: 3px dashed var(--secondary-color); 
+            flex-grow: 1;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .event { margin-bottom: 25px; padding-left: 12px; border-left: 3px solid #FFDAB9; }
+        .event-time { font-weight: bold; color: var(--primary-color); font-size: 0.85em; background: #FFF3E0; padding: 2px 8px; border-radius: 8px; }
+        .event-title { font-weight: bold; margin: 5px 0; display: flex; align-items: center; font-size: 1.1em; }
+        .event-details { font-size: 0.9em; color: #6D4C41; white-space: pre-line; line-height: 1.5; }
+        .map-link { display: inline-block; margin-top: 8px; background: #E8F5E9; color: #2E7D32; padding: 5px 10px; border-radius: 8px; text-decoration: none; font-size: 0.8em; font-weight: bold; }
+        
+        /* 推薦菜單區樣式 */
+        .menu-list { background: #FFF9F0; padding: 10px; border-radius: 10px; margin-top: 8px; font-size: 0.85em; color: #8B4513; border: 1px solid #FFEBCD; }
+    </style>
+</head>
+<body>
+
+    <div class="banner-container">
+        <img src="banner.png" alt="2026九州親子自由行" class="banner-img">
+    </div>
+
+    <div class="nav-dates" id="dateNav"></div>
+
+    <div class="itinerary-container" id="itineraryContent"></div>
+
+    <script>
+        const itineraryData = [
+            { date: "5/23 (六)", events: [
+                { time: "19:20", title: "抵達福岡機場", icon: "🛬", details: "領取行李後搭計程車前往住宿" },
+                { time: "Checkin", title: "My stay hotel 福岡天神", icon: "🏨", details: "辦理入住", map: "https://maps.app.goo.gl/9Zp6Y6wY8n7w9jXp6" },
+                { 
+                    time: "晚餐", 
+                    title: "博多拉麵 ShinShin 天神本店", 
+                    icon: "🍜", 
+                    details: "福岡必吃豚骨拉麵\n\n🌟 推薦菜單 Top 3：\n1. 博多ShinShinらーめん ¥820\n2. 半炒飯 ¥390\n3. 一口餃子(8個) ¥590", 
+                    map: "https://maps.app.goo.gl/kXv5R7n9wXf3n3zP7" 
+                }
+            ]},
+            { date: "5/24 (日)", events: [
+                { time: "全天", title: "海之中道行程", icon: "🐬", details: "🌞沒雨: 海之中道公園\n☔下雨: 海之中道水族館" }
+            ]},
+            { date: "5/25 (一)", events: [
+                { time: "全天", title: "太宰府行程", icon: "🎈", details: "🌞沒雨: 天滿宮\n☔下雨: 麵包超人遊樂園" }
+            ]},
+            { date: "5/26 (二)", events: [
+                { time: "上午", title: "採買並出發", icon: "🍮", details: "治一郎布丁*6、明太子麵包*4" },
+                { time: "下午", title: "由布院 Checkin", icon: "🏞️", details: "住金鱗湖旁" }
+            ]},
+            { date: "5/27 (三)", events: [
+                { time: "09:00", title: "九州自然動物園", icon: "🚌", details: "叢林巴士餵食 (票¥2600/¥1300)", map: "https://maps.app.goo.gl/hXf5R7n9wXf3n3zP8" },
+                { time: "下午", title: "由布院散策", icon: "🦉", details: "貓頭鷹之森、花卉村、可樂餅" }
+            ]},
+            { date: "5/28 (四)", events: [
+                { time: "上午", title: "阿蘇卡得利動物園", icon: "🐻", details: "火山直升機體驗" }
+            ]},
+            { date: "5/29 (五)", events: [
+                { time: "12:00", title: "高千穗峽划船", icon: "🛶", details: "需提早預約 (¥4100-5100)" }
+            ]},
+            { date: "5/30 (六)", events: [
+                { time: "上午", title: "福岡 LaLaport", icon: "🛍️", details: "1:1 鋼彈看點", map: "https://maps.app.goo.gl/jXf5R7n9wXf3n3zP9" },
+                { time: "午餐", title: "利久牛舌", icon: "👅", details: "美味午餐" },
+                { time: "17:30", title: "還車回機場", icon: "✈️", details: "20:20 飛機回台" }
+            ]}
+        ];
+
+        function showDay(idx) {
+            const day = itineraryData[idx];
+            document.querySelectorAll('.date-btn').forEach((b, i) => b.className = i === idx ? 'date-btn active' : 'date-btn');
+            
+            let html = '';
+            day.events.forEach(e => {
+                html += `
+                    <div class="event">
+                        <span class="event-time">${e.time}</span>
+                        <div class="event-title">${e.icon} ${e.title}</div>
+                        <div class="event-details">${e.details}</div>
+                        ${e.map ? `<a href="${e.map}" target="_blank" class="map-link">📍 地圖導航</a>` : ''}
+                    </div>
+                `;
+            });
+            
+            const content = document.getElementById('itineraryContent');
+            content.innerHTML = html;
+            content.scrollTop = 0;
+        }
+
+        const nav = document.getElementById('dateNav');
+        itineraryData.forEach((d, i) => {
+            const b = document.createElement('button');
+            b.innerText = d.date;
+            b.className = 'date-btn';
+            b.onclick = () => showDay(i);
+            nav.appendChild(b);
+        });
+        showDay(0);
+    </script>
+</body>
+</html>
