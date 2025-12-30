@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026九州親子自由行</title>
+    <style>
+        :root { --bg-color: #FFF8E7; --primary-color: #F4A460; --secondary-color: #87CEEB; --text-color: #5D4037; --active-color: #5D4037; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); }
+        body { font-family: '微軟正黑體', sans-serif; display: flex; flex-direction: column; background-image: radial-gradient(#F0E0D0 1px, transparent 1px); background-size: 20px 20px; }
+        .banner-container { width: 100%; text-align: center; margin-bottom: 2px; padding: 0; flex-shrink: 0; }
+        .banner-img { width: 100%; max-width: 100%; display: block; border-radius: 0 0 15px 15px; }
+        .nav-dates { display: flex; overflow-x: auto; gap: 8px; padding: 5px 10px; margin-bottom: 5px; flex-shrink: 0; -webkit-overflow-scrolling: touch; }
+        .nav-dates::-webkit-scrollbar { display: none; }
+        .date-btn { background-color: #fff; border: 2px solid var(--primary-color); border-radius: 12px; padding: 10px 15px; cursor: pointer; font-weight: bold; font-size: 1em; color: var(--primary-color); flex-shrink: 0; white-space: nowrap; }
+        .date-btn.active { background-color: var(--active-color); color: #fff; border-color: var(--active-color); }
+        .itinerary-container { margin: 0 10px 10px 10px; background-color: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 3px dashed var(--secondary-color); flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .event { margin-bottom: 25px; padding-left: 12px; border-left: 3px solid #FFDAB9; }
+        .event-time { font-weight: bold; color: var(--primary-color); font-size: 0.85em; background: #FFF3E0; padding: 2px 8px; border-radius: 8px; }
+        .event-title { font-weight: bold; margin: 5px 0; display: flex; align-items: center; font-size: 1.1em; }
+        .event-details { font-size: 0.9em; color: #6D4C41; white-space: pre-line; line-height: 1.5; }
+        .map-link { display: inline-block; margin-top: 8px; background: #E8F5E9; color: #2E7D32; padding: 5px 10px; border-radius: 8px; text-decoration: none; font-size: 0.8em; font-weight: bold; }
+        .welcome-text { width: 100%; display: block; font-size: 2.2em; font-weight: 900; color: #E67E22; text-align: center; margin: 10px 0 25px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .menu-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; margin-top: 10px; scrollbar-width: none; }
+        .menu-scroll::-webkit-scrollbar { display: none; }
+        .menu-card { flex: 0 0 145px; background: #fff; border: 1px solid #FFEBCD; border-radius: 12px; overflow: hidden; box-shadow: 2px 2px 6px rgba(0,0,0,0.03); }
+        .menu-card img { width: 100%; height: 95px; object-fit: cover; }
+        .menu-info { padding: 8px; text-align: center; }
+        .menu-name { font-size: 0.8em; font-weight: bold; color: #5D4037; margin-bottom: 4px; display: block; height: 2.4em; overflow: hidden; }
+        .menu-price { font-size: 0.85em; color: var(--primary-color); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="banner-container"><img src="banner.png" alt="2026九州親子自由行" class="banner-img"></div>
+    <div class="nav-dates" id="dateNav"></div>
+    <div class="itinerary-container" id="itineraryContent"></div>
+
+    <script>
+        const itineraryData = [
+            { date: "5/23 (六)", events: [
+                { time: "19:20", title: "抵達福岡機場", icon: "🛬", details: "領取行李後搭計程車前往住宿" },
+                { time: "Checkin", title: "My stay hotel 福岡天神", icon: "🏨", details: "辦理入住", map: "https://maps.app.goo.gl/pWP9CZRuosNpuQFo9?g_st=ic" },
+                { time: "晚餐", title: "博多拉麵 ShinShin 天神本店", icon: "🍜", details: "🕒 11:00-03:00 (週三休)\n湯頭濃郁的必吃拉麵", map: "https://www.google.com/maps/search/?api=1&query=博多らーめん+Shin-Shin+天神本店",
+                  menu: [
+                    { name: "博多純情拉麵", price: "¥820", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400" },
+                    { name: "一口餃子(8個)", price: "¥580", img: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=400" },
+                    { name: "半炒飯", price: "¥390", img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400" }
+                  ] }
+            ]},
+            { date: "5/24 (日)", events: [
+                { time: "10:00", title: "早餐", icon: "🍙", details: "便利商店買早餐吃" },
+                { time: "上午", title: "🌞 海之中道海濱公園 (晴天方案)", icon: "🌳", details: "🕒 09:30-17:30\n🎫 大人¥450, 國中生以下免費", map: "https://www.google.com/maps/search/?api=1&query=海之中道海濱公園",
+                  menu: [
+                    { name: "鯨魚雲朵蹦蹦床", price: "巨型跳台", img: "https://static.gltjp.com/glt/data/article/21000/20355/20230807_160402_d5e22eb2_w1280.webp" },
+                    { name: "動物之森", price: "近距離互動", img: "https://static.gltjp.com/glt/data/article/21000/20355/20230807_160315_c7981601_w1280.webp" },
+                    { name: "天空海豚遊樂場", price: "大型遊具區", img: "https://static.gltjp.com/glt/data/article/21000/20355/20230807_160659_996b3995_w1280.webp" },
+                    { name: "單車之旅", price: "12公里車道", img: "https://static.gltjp.com/glt/data/article/21000/20355/20251018_045644_63d4c6f5_w1280.webp" }
+                  ] },
+                { time: "備案", title: "☔ 海之中道海洋世界 (雨天方案)", icon: "🐬", details: "🕒 09:30-17:30\n🎫 大人¥2500, 中小學生¥1200", map: "https://www.google.com/maps/search/?api=1&query=海之中道海洋世界",
+                  menu: [
+                    { name: "海豚秀", price: "必看表演", img: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?w=400" },
+                    { name: "外洋水槽秀", price: "深 7 公尺", img: "https://images.unsplash.com/photo-1501908734255-16579c18c25f?w=400" },
+                    { name: "海獺餵食", price: "療癒推薦", img: "https://images.unsplash.com/photo-1546024023-f0ff871233e4?w=400" }
+                  ] },
+                { time: "晚餐", title: "大阪燒肉 ふたご 大名店", icon: "🥩", details: "🕒 15:00-00:00\n人氣日式燒烤，推薦必點橫膈膜", map: "https://maps.app.goo.gl/LX5g659Sd2pmhmp3A?g_st=ic" }
+            ]},
+            { date: "5/25 (一)", events: [
+                { time: "上午", title: "🌞 太宰府天滿宮 (晴天方案)", icon: "⛩️", 
+                  details: "📜 【歷史背景】\n祭祀學問之神菅原道真公，祈求學業進步。境內飛梅傳說與歷史建築值得一訪。\n\n🕒 06:30-19:00\n🎫 免費入園\n\n😋 【表參道 5 大必吃】\n1. 梅枝餅 (かさの家)\n2. 草莓大福 (Kingberry)\n3. 太宰府漢堡 (筑紫庵)\n4. 明太子茶漬 (ふくや)\n5. 合格拉麵 (一蘭)", map: "https://maps.app.goo.gl/L5bf5QEW8frG1At4A?g_st=ic" },
+                { time: "備案", title: "☔ 麵包超人遊樂園 (雨天方案)", icon: "🎈", 
+                  details: "🕒 10:00-17:00\n🎫 ¥1,800-2,200\n全室內場域，適合小小孩放電。", map: "https://maps.app.goo.gl/ZXyLSf6qLF7TuR3W9?g_st=ic" }
+            ]},
+            { date: "5/26 (二)", events: [
+                { time: "WELCOME", title: "瑞蓮一家來囉！", icon: "🥳", details: "", special: "welcome" },
+                { time: "上午", title: "採買車上點心", icon: "🍮", details: "治一郎布丁 x 6 / Fullfull 明太子麵包 x 4",
+                  menu: [
+                    { name: "治一郎布丁", price: "買6個", img: "https://article-image.travel.navitime.jp/img/NTJnews0613-zh-tw/jiichirou_2.jpg" },
+                    { name: "Fullfull明太子麵包", price: "買4個", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLtj6MVN0t5R-s4oi-6_ZK4Z8bKlgrb66RcZ_dzM6IIw&s=10" }
+                  ] },
+                { time: "11:00", title: "租車會合", icon: "🤝", details: "與瑞蓮一家會合。", map: "https://maps.app.goo.gl/DrY21XDF6ruKLnvn8?g_st=ic" },
+                { time: "下午", title: "由布院民宿 Check-in", icon: "🚗", details: "入住由布院民宿。", map: "https://maps.app.goo.gl/zXnBtT4u4ypnQY2L7?g_st=ic" },
+                { time: "晚餐", title: "由布釜飯「心」金鱗湖本店", icon: "🍚", details: "🕒 10:30-18:30 (不定休)\n推薦牛釜飯套餐！",
+                  menu: [
+                    { name: "豐後牛釜飯套餐", price: "¥2,650", img: "https://assets.funliday.com/posts/wp-content/uploads/2025/03/09163637/menu_001-1600x1200.jpg" },
+                    { name: "鰻魚釜飯套餐", price: "¥2,650", img: "https://slowandtravel.com/wp-content/uploads/2023/01/L1570656.jpg" }
+                  ] },
+                { time: "小吃", title: "由布院必吃小吃", icon: "😋", 
+                  menu: [
+                    { name: "金賞可樂餅", price: "¥200", img: "https://flyblog.cc/webp/wp-content/uploads/2023/12/IMG_2727.jpg.webp" },
+                    { name: "花麴菊家(布丁銅鑼燒)", price: "¥220", img: "https://svcstrg.cld.navitime.jp/imgfile/02301_1600048_02.jpg?" },
+                    { name: "鞠智(手燒銅鑼燒)", price: "¥300", img: "https://gogojp.tw/wp-content/uploads/2024/03/20240303214844_0.jpg" },
+                    { name: "telato(抹茶冰淇淋)", price: "¥500", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY1diJxYThbw9aYPX58xrSydP1CPxMpeqTbJ2-hl5HRbxPSFavtu_ApZUl&s=10" }
+                  ] }
+            ]},
+            { date: "5/27 (三)", events: [
+                { time: "08:30", title: "早餐 & 出發", icon: "🦁", details: "早餐：Lawson 買上車吃。" },
+                { time: "09:00", title: "九州自然動物園 African Safari", icon: "🚌", 
+                  details: "🕒 09:00 - 16:30\n🎫 門票：大人 ¥2600 (含自駕、4歲以下免費)\n📍 到「綜合案內所」買票及購買叢林巴士票。", 
+                  map: "https://maps.app.goo.gl/eKeBxTSdAaNkiMi59?g_st=ic",
+                  menu: [
+                    { name: "園區導覽地圖", price: "預覽地圖", img: "https://assets.funliday.com/posts/wp-content/uploads/2024/07/27012031/map-2-1024x740.png" }
+                  ] 
+                },
+                { time: "體驗", title: "叢林巴士 Jungle Bus", icon: "🐅", 
+                  details: "🎫 費用：大人 ¥1300\n💡 建議坐「面對車頭右側中間」！",
+                  menu: [
+                    { name: "叢林巴士", price: "近距離餵食", img: "https://marktrip.tw/wp-content/uploads/2025/02/20250215222658_0_f251ff.jpg" }
+                  ]
+                }
+            ]},
+            { date: "5/28 (四)", events: [
+                { time: "08:30", title: "早餐 & 出發", icon: "⏰", details: "早餐：Lawson 買上車吃。\n準時前往阿蘇卡得利動物園。" },
+                { time: "上午", title: "阿蘇卡得利動物園 Cuddly Dominion", icon: "🐻", 
+                  details: "🕒 09:30 - 17:00\n🎫 門票：大人 ¥2,600 / 兒童 ¥1,400\n阿蘇親子必訪動物園，可與熊近距離接觸。", 
+                  map: "https://maps.app.goo.gl/eaP5CR9dMikonBgaA?g_st=ic",
+                  menu: [{ name: "動物園入園", price: "門票資訊", img: "https://res.klook.com/images/fl_lossy.progressive,q_65/c_fill,w_1295,h_863/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/fjgv9s8zslhmtx1qisn3/%E9%98%BF%E8%98%87%E5%8D%A1%E5%BE%B7%E5%88%A9%E5%8B%95%E7%89%A9%E6%A8%82%E5%9C%92%E9%96%80%E7%A5%A8.jpg" }]
+                },
+                { time: "必玩", title: "阿蘇火山直升機體驗", icon: "🚁", 
+                  details: "📍 入園後直奔直升機售票處劃位！\n\n【方案價格表】\n● B航線(4分)：大人¥6,000 / 兒童¥5,000 (阿蘇山麓)\n● C航線(7分)：大人¥10,000 / 兒童¥9,000 (火山口震撼)\n● D航線(10分)：大人¥14,000 / 兒童¥13,000 (超值感受)\n● E航線(15分)：全機包機 ¥60,000 (最多3人)",
+                  menu: [{ name: "直升機體驗", price: "震撼景觀", img: "https://ariair.arila.co.jp/wp-content/uploads/2025/02/4955439e99ff716028ee84d09666c10c.jpg" }]
+                },
+                { time: "午餐", title: "鄉土料理 山賊旅路", icon: "🥢", 
+                  details: "🕒 11:00 - 17:00\n必點阿蘇在地「麵疙瘩湯定食」！\n\n😋 推薦菜單：\n● 山賊麵疙瘩湯定食 ¥1,300\n● 高菜飯(阿蘇特產) ¥800\n● 烤土雞 ¥1,200", 
+                  map: "https://maps.app.goo.gl/E6GvrNPBzWdPA2N79?g_st=ic"
+                },
+                { time: "下午", title: "草千里之濱 Kusasenri", icon: "🐎", 
+                  details: "📜 簡介：阿蘇最具代表性的景點，廣大的草皮與火山口對望。\n\n🐎 【騎馬體驗】\n🕒 09:30-16:30\n🎫 價格：A航線(約5分) ¥1,500 / B航線(約20分) ¥3,000"
+                },
+                { time: "住宿", title: "阿蘇民宿 Check-in", icon: "🏨", details: "入住阿蘇地區民宿。", map: "https://maps.app.goo.gl/fhcBKZjekphFMY1YA?g_st=ic" }
+            ]},
+            { date: "5/29 (五)", events: [
+                { time: "12:00", title: "高千穗峽划船", icon: "🛶", details: "🚨 需提早兩週預訂！", map: "https://maps.app.goo.gl/TakachihoGorge" },
+                { time: "晚餐", title: "高森田樂之里", icon: "🍢", details: "🕒 11:00-19:00", map: "https://maps.app.goo.gl/TakamoriDengaku",
+                  menu: [{ name: "田樂定食", price: "¥2,490", img: "https://images.unsplash.com/photo-1580442151529-343f2f5e0e27?w=400" }] }
+            ]},
+            { date: "5/30 (六)", events: [
+                { time: "上午", title: "福岡 LaLaport", icon: "🛍️", details: "🤖 1:1 實物大鋼彈", map: "https://maps.app.goo.gl/LaLaportFukuoka" },
+                { time: "午餐", title: "利久牛舌", icon: "👅", details: "🕒 11:00-22:00", map: "https://maps.app.goo.gl/RikyuFukuoka",
+                  menu: [
+                    { name: "牛舌定食", price: "¥2,409", img: "https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?w=400" }
+                  ] }
+            ]}
+        ];
+
+        function showDay(idx) {
+            const day = itineraryData[idx];
+            document.querySelectorAll('.date-btn').forEach((b, i) => b.className = i === idx ? 'date-btn active' : 'date-btn');
+            let html = '';
+            day.events.forEach(e => {
+                if(e.special === 'welcome') {
+                    html += `<div class="welcome-text">${e.title}</div>`;
+                } else {
+                    html += `
+                        <div class="event">
+                            <span class="event-time">${e.time}</span>
+                            <div class="event-title">${e.icon} ${e.title}</div>
+                            <div class="event-details">${e.details || ''}</div>
+                            ${e.menu ? `<div class="menu-scroll">${e.menu.map(item => `<div class="menu-card"><img src="${item.img}" alt="${item.name}"><div class="menu-info"><span class="menu-name">${item.name}</span><span class="menu-price">${item.price}</span></div></div>`).join('')}</div>` : ''}
+                            ${e.map ? `<a href="${e.map}" target="_blank" class="map-link">📍 地圖導航</a>` : ''}
+                        </div>
+                    `;
+                }
+            });
+            const content = document.getElementById('itineraryContent');
+            content.innerHTML = html;
+            content.scrollTop = 0;
+        }
+
+        const nav = document.getElementById('dateNav');
+        itineraryData.forEach((d, i) => {
+            const b = document.createElement('button');
+            b.innerText = d.date;
+            b.className = 'date-btn';
+            b.onclick = () => showDay(i);
+            nav.appendChild(b);
+        });
+        showDay(0);
+    </script>
+</body>
+</html>
