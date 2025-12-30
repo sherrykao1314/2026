@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026九州親子自由行</title>
+    <style>
+        /* --- CSS 更新：按鈕與配色優化 --- */
+        :root { 
+            --bg-color: #FFF8E7; 
+            --primary-color: #F4A460; 
+            --secondary-color: #87CEEB; 
+            --text-color: #5D4037;
+            --active-color: #5D4037; /* 選中按鈕的顏色：深咖啡色 */
+        }
+        body { font-family: '微軟正黑體', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; background-image: radial-gradient(#F0E0D0 1px, transparent 1px); background-size: 20px 20px; }
+        h1 { text-align: center; color: var(--primary-color); font-size: 1.8em; margin-bottom: 20px; text-shadow: 2px 2px 0px #FFE4B5; }
+        
+        /* 調整按鈕變大 */
+        .nav-dates { display: flex; overflow-x: auto; gap: 15px; padding: 15px 5px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .date-btn { 
+            background-color: #fff; 
+            border: 2px solid var(--primary-color); 
+            border-radius: 18px; 
+            padding: 15px 25px; /* 加大內距 */
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1em; /* 加大字體 */
+            color: var(--primary-color); 
+            flex-shrink: 0; 
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        
+        /* 選中按鈕變換顏色區分 */
+        .date-btn.active { 
+            background-color: var(--active-color); 
+            color: #fff; 
+            border-color: var(--active-color);
+            transform: scale(1.05);
+        }
+
+        .itinerary-container { max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 3px dashed var(--secondary-color); position: relative; min-height: 400px; }
+        
+        .day-header { text-align: center; margin-bottom: 25px; border-bottom: 1px dashed #eee; padding-bottom: 15px; }
+        
+        /* 天氣連結樣式 */
+        .weather-widget { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .jma-link { font-size: 0.9em; color: #0288D1; text-decoration: underline; font-weight: bold; }
+
+        .event { margin-bottom: 25px; padding-left: 15px; border-left: 3px solid #FFDAB9; }
+        .event-time { font-weight: bold; color: var(--primary-color); font-size: 0.9em; background: #FFF3E0; padding: 3px 10px; border-radius: 8px; }
+        .event-title { font-weight: bold; margin: 8px 0 5px 0; display: flex; align-items: center; font-size: 1.15em; }
+        .event-details { font-size: 0.95em; color: #6D4C41; white-space: pre-line; line-height: 1.6; }
+        .map-link { display: inline-block; margin-top: 10px; background: #E8F5E9; color: #2E7D32; padding: 5px 12px; border-radius: 8px; text-decoration: none; font-size: 0.85em; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>✨ 2026九州親子自由行 ✨</h1>
+    <div class="nav-dates" id="dateNav"></div>
+    <div class="itinerary-container" id="itineraryContent">
+        <p style="text-align:center; color:#999; padding-top:100px;">正在努力更新行程細節...</p>
+    </div>
+
+    <script>
+        const itineraryData = [
+            { date: "5/23 (六)", weather: { icon: "🌙", text: "舒適", temp: "18°C" }, events: [
+                { time: "19:20", title: "抵達福岡機場", icon: "🛬", details: "搭計程車前往住宿" },
+                { time: "Checkin", title: "My stay hotel 福岡天神", icon: "🏨", details: "辦理入住" },
+                { time: "晚餐", title: "博多拉麵 ShinShin", icon: "🍜", details: "天神本店", map: "https://www.google.com/maps/search/ShinShin+Tenjin" }
+            ]},
+            { date: "5/24 (日)", weather: { icon: "🌦️", text: "偶雨", temp: "22°C" }, events: [
+                { time: "上午", title: "海之中道行程", icon: "🐬", details: "🌞沒雨: 海之中道公園\n☔下雨: 海之中道水族館", map: "https://www.google.com/maps/search/Uminonakamichi" },
+                { time: "晚餐", title: "大阪燒肉 ふたご", icon: "🥩", details: "大名店" }
+            ]},
+            { date: "5/25 (一)", weather: { icon: "⛩️", text: "晴時多雲", temp: "24°C" }, events: [
+                { time: "全天", title: "太宰府/遊樂園", icon: "🎈", details: "🌞沒雨: 太宰府天滿宮\n☔下雨: 麵包超人遊樂園", map: "https://www.google.com/maps/search/Dazaifu" }
+            ]},
+            { date: "5/26 (二)", weather: { icon: "🚗", text: "晴", temp: "25°C" }, events: [
+                { time: "上午", title: "採買並出發由布院", icon: "🍮", details: "買治一郎布丁*6、明太子麵包*4" },
+                { time: "下午", title: "由布院 Check-in", icon: "🏞️", details: "住金鱗湖旁", map: "https://www.google.com/maps/search/Lake+Kinrin" },
+                { time: "晚餐", title: "由布釜飯「心」", icon: "🍚", details: "金鱗湖本店" }
+            ]},
+            { date: "5/27 (三)", weather: { icon: "🦁", text: "晴朗", temp: "23°C" }, events: [
+                { time: "09:00", title: "九州自然動物園", icon: "🚌", details: "搭叢林巴士餵動物\n大人票¥2600 / 巴士¥1300", map: "https://www.google.com/maps/search/African+Safari+Kyushu" },
+                { time: "下午", title: "由布院散策", icon: "🦉", details: "貓頭鷹之森、花卉村、可樂餅" }
+            ]},
+            { date: "5/28 (四)", weather: { icon: "🚁", text: "晴", temp: "21°C" }, events: [
+                { time: "上午", title: "阿蘇卡得利動物園", icon: "🐻", details: "搭乘火山直升機", map: "https://www.google.com/maps/search/Cuddly+Dominion" },
+                { time: "午餐", title: "あか牛丼専門店", icon: "🥩", details: "阿蘇紅牛丼" }
+            ]},
+            { date: "5/29 (五)", weather: { icon: "🛶", text: "涼爽", temp: "22°C" }, events: [
+                { time: "12:00", title: "高千穗峽划船", icon: "🛶", details: "需提早兩週預訂！\n費用 ¥4100-5100", map: "https://www.google.com/maps/search/Takachiho+Gorge" },
+                { time: "下午", title: "上色見熊野座神社", icon: "⛩️", details: "參拜熱門神社" }
+            ]},
+            { date: "5/30 (六)", weather: { icon: "🤖", text: "晴", temp: "24°C" }, events: [
+                { time: "上午", title: "福岡 LaLaport", icon: "🛍️", details: "看 1:1 實物大鋼彈", map: "https://www.google.com/maps/search/LaLaport+Fukuoka" },
+                { time: "午餐", title: "利久牛舌", icon: "👅", details: "美味午餐" },
+                { time: "20:20", title: "飛機回台", icon: "✈️", details: "17:30 還車" }
+            ]}
+        ];
+
+        function showDay(idx) {
+            const day = itineraryData[idx];
+            
+            // 更新按鈕狀態
+            document.querySelectorAll('.date-btn').forEach((b, i) => b.className = i === idx ? 'date-btn active' : 'date-btn');
+            
+            // 組合內容 (移除日期 <h2>)
+            let html = `
+                <div class="day-header">
+                    <div class="weather-widget">
+                        <span style="font-size: 1.2em; font-weight: bold;">${day.weather.icon} ${day.weather.text} ${day.weather.temp}</span>
+                        <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="jma-link">🔗日本氣象廳的天氣預測</a>
+                    </div>
+                </div>
+            `;
+            
+            day.events.forEach(e => {
+                html += `
+                    <div class="event">
+                        <span class="event-time">${e.time}</span>
+                        <div class="event-title">${e.icon} ${e.title}</div>
+                        <div class="event-details">${e.details}</div>
+                        ${e.map ? `<a href="${e.map}" target="_blank" class="map-link">📍 地圖導航</a>` : ''}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('itineraryContent').innerHTML = html;
+        }
+
+        const nav = document.getElementById('dateNav');
+        itineraryData.forEach((d, i) => {
+            const b = document.createElement('button');
+            b.innerText = d.date.split(' ')[0]; // 只顯示日期數字部分
+            b.className = 'date-btn';
+            b.onclick = () => showDay(i);
+            nav.appendChild(b);
+        });
+        showDay(0);
+    </script>
+</body>
+</html>
