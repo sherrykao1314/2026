@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026九州親子自由行</title>
+    <style>
+        :root { --bg-color: #FFF8E7; --primary-color: #F4A460; --secondary-color: #87CEEB; --text-color: #5D4037; }
+        body { font-family: '微軟正黑體', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; background-image: radial-gradient(#F0E0D0 1px, transparent 1px); background-size: 20px 20px; }
+        h1 { text-align: center; color: var(--primary-color); font-size: 1.8em; margin-bottom: 20px; text-shadow: 2px 2px 0px #FFE4B5; }
+        .nav-dates { display: flex; overflow-x: auto; gap: 10px; padding: 10px 5px; margin-bottom: 15px; -webkit-overflow-scrolling: touch; }
+        .date-btn { background-color: #fff; border: 2px solid var(--primary-color); border-radius: 15px; padding: 8px 15px; cursor: pointer; font-weight: bold; color: var(--primary-color); flex-shrink: 0; }
+        .date-btn.active { background-color: var(--primary-color); color: #fff; }
+        .itinerary-container { max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 3px dashed var(--secondary-color); position: relative; min-height: 400px; }
+        .day-header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+        .weather-widget { display: inline-flex; align-items: center; background-color: #E1F5FE; padding: 5px 12px; border-radius: 15px; font-size: 0.9em; color: #0288D1; }
+        .event { margin-bottom: 25px; padding-left: 15px; border-left: 3px solid #FFDAB9; }
+        .event-time { font-weight: bold; color: var(--primary-color); font-size: 0.85em; background: #FFF3E0; padding: 2px 8px; border-radius: 8px; }
+        .event-title { font-weight: bold; margin: 8px 0 5px 0; display: flex; align-items: center; font-size: 1.1em; }
+        .event-details { font-size: 0.9em; color: #6D4C41; white-space: pre-line; line-height: 1.5; }
+        .map-link { display: inline-block; margin-top: 8px; background: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 8px; text-decoration: none; font-size: 0.8em; font-weight: bold; }
+        .map-link:hover { background: #C8E6C9; }
+        .badge { display: inline-block; background: #FFEB3B; padding: 1px 6px; border-radius: 4px; font-size: 0.8em; margin-right: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>✨ 2026九州親子自由行 ✨</h1>
+    <div class="nav-dates" id="dateNav"></div>
+    <div class="itinerary-container" id="itineraryContent">
+        <p style="text-align:center; color:#999; padding-top:100px;">正在努力載入最新細節...</p>
+    </div>
+
+    <script>
+        const itineraryData = [
+            { date: "5/23 (六)", weather: { icon: "🌙", text: "舒適", temp: "18°C" }, events: [
+                { time: "19:20", title: "抵達福岡機場", icon: "🛬", details: "領取行李後搭計程車前往住宿" },
+                { time: "Checkin", title: "My stay hotel 福岡天神", icon: "🏨", details: "放下行李，準備吃晚餐", map: "https://maps.app.goo.gl/B9R38U8H4N4pA5yJ7" },
+                { time: "晚餐", title: "博多拉麵 ShinShin", icon: "🍜", details: "天神本店，必吃福岡豚骨拉麵", map: "https://maps.app.goo.gl/uXpLg2s6FzE8E8TBA" }
+            ]},
+            { date: "5/24 (日)", weather: { icon: "🌦️", text: "多雲偶雨", temp: "22°C" }, events: [
+                { time: "全天", title: "海之中道行程", icon: "🐬", details: "🌞沒下雨：海之中道公園野餐\n☔下雨天：海之中道水族館", map: "https://maps.app.goo.gl/YV9XqS8B6C7D5E4F9" },
+                { time: "晚餐", title: "大阪燒肉 ふたご", icon: "🥩", details: "大名店，美味日式燒肉", map: "https://maps.app.goo.gl/X9Y8Z7A6B5C4D3E2F" }
+            ]},
+            { date: "5/25 (一)", weather: { icon: "⛩️", text: "晴時多雲", temp: "24°C" }, events: [
+                { time: "全天", title: "太宰府行程", icon: "🎈", details: "🌞沒下雨：太宰府天滿宮 & 遊樂園\n☔下雨天：麵包超人遊樂園", map: "https://maps.app.goo.gl/A1B2C3D4E5F6G7H8" },
+                { time: "午餐", title: "美食選擇", icon: "🍱", details: "緣結び食堂 なみ滿 或購物商場美食街" }
+            ]},
+            { date: "5/26 (二)", weather: { icon: "🥐", text: "晴", temp: "25°C" }, events: [
+                { time: "上午", title: "走路採買點心", icon: "🍮", details: "🔸治一郎布丁 * 6\n🔸Fullfull 明太子麵包 * 4" },
+                { time: "出發", title: "租車前往由布院", icon: "🚗", details: "Hi-Hi レンタカー福岡空港駅店合流\n車程約 1小時35分", map: "https://maps.app.goo.gl/Z1Y2X3W4V5U6T7S8" },
+                { time: "下午", title: "由布院 Check-in", icon: "🏞️", details: "入住金鱗湖旁住宿", map: "https://maps.app.goo.gl/J1K2L3M4N5O6P7Q8" },
+                { time: "晚餐", title: "由布釜飯「心」", icon: "🍚", details: "金鱗湖本店，排隊名店", map: "https://maps.app.goo.gl/R1S2T3U4V5W6X7Y8" }
+            ]},
+            { date: "5/27 (三)", weather: { icon: "🦁", text: "晴朗", temp: "23°C" }, events: [
+                { time: "09:00", title: "九州自然動物園", icon: "🚌", details: "8:30出門，9:00到綜合案內所買票\n🎫大人: ¥2600 / 叢林巴士: ¥1300\n(4歲以下免費)", map: "https://maps.app.goo.gl/H1I2J3K4L5M6N7O8" },
+                { time: "下午", title: "由布院散策", icon: "🦉", details: "🔸貓頭鷹之森、花卉村、昭和館\n😋必吃：金賞可樂餅、吉吾炸雞、鞠智銅鑼燒" }
+            ]},
+            { date: "5/28 (四)", weather: { icon: "🚁", text: "晴", temp: "21°C" }, events: [
+                { time: "08:00", title: "出門前往阿蘇", icon: "⏰", details: "車程約 1小時30分" },
+                { time: "上午", title: "阿蘇卡得利動物園", icon: "🐻", details: "搭乘火山直升機體驗", map: "https://maps.app.goo.gl/F1G2H3I4J5K6L7M8" },
+                { time: "午餐", title: "あか牛丼専門店 ごとう屋", icon: "🥩", details: "阿蘇店，品嚐在地紅牛", map: "https://maps.app.goo.gl/P1Q2R3S4T5U6V7W8" },
+                { time: "下午", title: "草千里騎馬體驗", icon: "🐎", details: "大草原美景騎馬", map: "https://maps.app.goo.gl/U1V2W3X4Y5Z6A7B8" }
+            ]},
+            { date: "5/29 (五)", weather: { icon: "🛶", text: "涼爽", temp: "22°C" }, events: [
+                { time: "08:00", title: "出發高千穗", icon: "🏪", details: "吃 Lawson 早餐，車程約 1小時" },
+                { time: "12:00", title: "高千穗峽划船", icon: "🛶", details: "🚨需提早兩週預訂！(訂12:00的船)\n費用約 ¥4100-5100/台", map: "https://maps.app.goo.gl/B1C2D3E4F5G6H7I8" },
+                { time: "下午", title: "小火車 & 神社", icon: "🚂", details: "高千穗小火車、上色見熊野座神社" }
+            ]},
+            { date: "5/30 (六)", weather: { icon: "🤖", text: "晴", temp: "24°C" }, events: [
+                { time: "上午", title: "福岡 LaLaport", icon: "🛍️", details: "看 1:1 實物大鋼彈 & 逛街", map: "https://maps.app.goo.gl/S1T2U3V4W5X6Y7Z8" },
+                { time: "午餐", title: "利久牛舌", icon: "👅", details: "美味厚切牛舌定食", map: "https://maps.app.goo.gl/G1H2I3J4K5L6M7N8" },
+                { time: "17:30", title: "還車前往機場", icon: "✈️", details: "20:20 班機回台灣\n(瑞蓮 21:00 班機)" }
+            ]}
+        ];
+
+        function showDay(idx) {
+            const day = itineraryData[idx];
+            document.querySelectorAll('.date-btn').forEach((b, i) => b.className = i === idx ? 'date-btn active' : 'date-btn');
+            let html = `<div class="day-header"><h2>🗓️ ${day.date}</h2><div class="weather-widget"><span>${day.weather.icon} ${day.weather.text} ${day.weather.temp}</span></div></div>`;
+            day.events.forEach(e => {
+                html += `
+                    <div class="event">
+                        <span class="event-time">${e.time}</span>
+                        <div class="event-title">${e.icon} ${e.title}</div>
+                        <div class="event-details">${e.details}</div>
+                        ${e.map ? `<a href="${e.map}" target="_blank" class="map-link">📍 地圖導航</a>` : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('itineraryContent').innerHTML = html;
+        }
+
+        const nav = document.getElementById('dateNav');
+        itineraryData.forEach((d, i) => {
+            const b = document.createElement('button');
+            b.innerText = d.date.split(' ')[0];
+            b.className = 'date-btn';
+            b.onclick = () => showDay(i);
+            nav.appendChild(b);
+        });
+        showDay(0);
+    </script>
+</body>
+</html>
